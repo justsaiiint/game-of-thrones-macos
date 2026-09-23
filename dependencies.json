@@ -1,0 +1,17 @@
+{
+  "wine": {
+    "filename": "WS11WineSikarugir11.0_1.tar.xz",
+    "url": "https://github.com/Sikarugir-App/Engines/releases/download/v1.0/WS11WineSikarugir11.0_1.tar.xz",
+    "sha256": "266e852bdb98e80da09f09d4ee10fd9fd3dbb6b18b0801c0836f1430c4979fb6"
+  },
+  "template": {
+    "filename": "Template-1.0.18.tar.xz",
+    "url": "https://github.com/Sikarugir-App/Template/releases/download/v1.0/Template-1.0.18.tar.xz",
+    "sha256": "00d1fcb66aebdef51981b26476a2fe8cd600c39552166f0e733f57272d9e97b3"
+  },
+  "steam": {
+    "filename": "SteamSetup.exe",
+    "url": "https://cdn.akamai.steamstatic.com/client/installer/SteamSetup.exe",
+    "sha256": "7d3654531c32d941b8cae81c4137fc542172bfa9635f169cb392f245a0a12bcb"
+  }
+}
