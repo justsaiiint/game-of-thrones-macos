@@ -20,7 +20,9 @@ import tempfile
 import urllib.request
 
 
-VERSION = "0.1.0"
+import wine_cleanup
+
+VERSION = "0.1.1"
 DEFAULT_ROOT = Path.home() / "Library/Application Support/Game of Thrones macOS"
 DEFAULT_APP = Path.home() / "Applications/Game of Thrones macOS.app"
 MARKER = "game-of-thrones-macos.json"
@@ -367,6 +369,7 @@ def prepare(args):
         shutil.copy2(files["steam"], root / "downloads/SteamSetup.exe")
         for name in ["thronesmac.py", "dependencies.json"]:
             shutil.copy2(Path(__file__).with_name(name), root / "launcher" / name)
+        shutil.copy2(Path(__file__).with_name("wine_cleanup.py"), root / "launcher/wine_cleanup.py")
         print("Creating the Windows environment...", flush=True)
         wine(root, ["wineboot", "--init"])
         register_game(root)
@@ -374,6 +377,7 @@ def prepare(args):
         write_json(root / MARKER, {"project": "game-of-thrones-macos", "version": VERSION,
                                   "app": str(app), "dependencies": manifest})
         create_app(root, app)
+        wine_cleanup.install(root)
     print(f"Prepared: {root}\nLauncher: {app}\nNext: python3 thronesmac.py install-steam --root {shlex.quote(str(root))}")
 
 
@@ -382,7 +386,7 @@ def main(argv=None):
         raise RuntimeError("Python 3.9 or later is required")
     parser = argparse.ArgumentParser(description=__doc__)
     sub = parser.add_subparsers(dest="command", required=True)
-    for command in ["prepare", "install-steam", "steam", "launch", "doctor"]:
+    for command in ["prepare", "install-steam", "steam", "launch", "doctor", "cleanup-enable", "cleanup-disable"]:
         item = sub.add_parser(command)
         item.add_argument("--root", type=lambda p: Path(p).expanduser().resolve(), default=DEFAULT_ROOT)
         if command == "prepare":
@@ -394,7 +398,16 @@ def main(argv=None):
         prepare(args)
         return
     root = args.root
+    if args.command == "cleanup-disable":
+        wine_cleanup.disable(root)
+        print("Automatic cleanup disabled for this installation.")
+        return
     config = require_install(root)
+    if args.command == "cleanup-enable":
+        with locked(root):
+            agent = wine_cleanup.install(root)
+        print(f"Automatic cleanup enabled: {agent}")
+        return
     if not inside(root / "logs", root):
         raise RuntimeError("Log files must stay inside the installation")
     if args.command == "doctor":

@@ -25,3 +25,11 @@ Fresh preparation from the pinned archives passed on that Mac. The prepared D9VK
 A complete new Steam sign-in, game download, and gameplay run through this packaged installer have not been tested. No second-machine validation is claimed.
 
 Keep download hashes pinned. If an upstream download changes, review it before updating the manifest. Review logs for account or path information before sharing them.
+
+## Automatic cleanup
+
+`wine_cleanup.py` installs a per-user LaunchAgent for each installation root. It runs every 30 seconds and exits after each check. The helper is copied into the installation, so the repository folder can be removed afterward. Rerun `cleanup-enable` to update it or after replacing the Python interpreter used during setup. `cleanup-disable` removes the scheduled check.
+
+Only `winedevice.exe` processes owned by the current user, loaded from this installation's runtime, and reparented to PID 1 are candidates. Any other Wine process in that runtime blocks cleanup. Unidentified Windows or Wine processes also block it. After 90 seconds of observed inactivity, the helper requests termination, then allows at least 30 more seconds before forcing termination. It rechecks process identity and activity before every signal. This handles orphaned device helpers, not arbitrary game hangs or active Wine servers.
+
+State and bounded logs stay in `maintenance/`. Automated tests cover grace periods, active clients, uncertain ownership, process ID reuse, and last-moment activity. Full gameplay on another Mac remains untested.
